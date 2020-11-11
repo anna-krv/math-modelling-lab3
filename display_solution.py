@@ -1,0 +1,2 @@
+class ShowTheSolution:
+    pass
