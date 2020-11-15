@@ -1,13 +1,1 @@
-0,5,0,5
-5
-x1*x2*t
-[(1,2), (3,2), (4,4)]
-[(0, 4, 2), (5,3,4), (1,0,3)]
-
-
-comments for info_format: 
-a,b,c,d - system is observed in [a,b]x[c,d]
-T - [0,T] - is time interval
-y(x1, x2, t) - is actual solution
-[(x1_i, x2_i)] - points for initial conditions at time t=0 for operator Lu(.,.,.)=u(.,.,0)
-[(x1_i, x2_i, t_i)] - points for boundary conditions for operator Lu(x1, x2, t) = du/dx1
+0,5,0,5#5#x1*x2*t
