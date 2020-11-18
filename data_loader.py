@@ -16,22 +16,24 @@ class LoadTheData:
             array = area_o[0].split(',')
             self.a, self.b, self.c, self.d = [float(x) for x in array]
             print(self.a, self.b, self.c, self.d)
-            t = area_o[1]
-            
-            self.T = float(t)
-            print(self.T)
-            Func = construct_lambda(str(area_o[2]))
-            print(str(Func))
+            #t = area_o[1]
+
+            #self.T = float(t)
+            #print(self.T)
+            self.Func = str(area_o[1]) #construct_lambda(str(area_o[2]))
+            print(str(self.Func))
         with open(init) as i_p:
-            i_points =np.array( i_p.readline())
-            print(str(i_points))
+            self.i_points = [(float(x), float(y), 0.) for x,y in [s.replace('(', '').split(',') for s in
+                                                     i_p.readline().split(')')[:-1]]]
+            print(self.i_points)
             #init_points = i_points.astype(np.float)
             #print(str(init_points))
             
         
         with open(boun) as b_p:
    
-            b_points =np.array( b_p.readline())
-            print(str(b_points))
+            self.b_points = [(float(x), float(y), float(t)) for x, y, t in [s.replace('(', '').split(',') for s in
+                                                     b_p.readline().split(')')[:-1]]]
+            print(str(self.b_points))
             #boun_points = b_points.astype(np.float) 
             #print(str(boun_points))

@@ -27,33 +27,36 @@ class Interaction:
         self.tabControl.add(self.tab1, text='Model')
         self.tabControl.add(self.tab2, text='Domain')
         self.tabControl.add(self.tab3, text='Conditions')
-        self.tabControl.add(self.tab4, text='Modelling')
+        # self.tabControl.add(self.tab4, text='Modelling')
 
         self.tabControl.pack(expand=1, fill="both")
 
         ''' Model Tab'''
-        tk.Label(self.tab1, text="Choose Model type:").grid(column=0,row=0,padx=30,pady=30)
+        tk.Label(self.tab1, text="Choose Model type (operator G):").grid(column=0,row=0,padx=30,pady=30)
 
-        ModelType = tk.StringVar(self.tab1)
-        ModelType.set("L1, G1")  # default value
+        self.ModelType = tk.StringVar(self.tab1)
 
-        dropdown1 = tk.OptionMenu(self.tab1, ModelType, "L1, G1", "L2, G2", "L3, G3")
+        model_options = {1: 'H(t-r/c)/(2*pi*c*sqrt(abs(c^2*t^2-r^2)))',
+                         2: 'H(t)*sqrt(4*pi*c*t)*exp(-r^2/(4*c*t))'}
+        self.ModelType.set(model_options[1])  # default value
+        dropdown1 = tk.OptionMenu(self.tab1, self.ModelType, *model_options.values())
         dropdown1.grid(column=1,row=0)
 
-        tk.Label(self.tab1, text="Choose the function:").grid(column=0,row=2,padx=30,pady=30)
+        tk.Label(self.tab1, text="Choose the function y:").grid(column=0,row=2,padx=30,pady=30)
 
-        func = tk.StringVar(self.tab1)
-        func.set("f1(x)")  # default value
-
-        dropdown2 = tk.OptionMenu(self.tab1, func, "f1(x)", "f2(x)", "f3(x)")
+        self.func = tk.StringVar(self.tab1)
+        func_options = {1: 't^4+x1^4+x2^4', 2: 't^3+x1^3+x2^3', 3: 't*x1*x2', 4: 'choose from file'}
+        self.func.set(func_options[1])  # default value
+        dropdown2 = tk.OptionMenu(self.tab1, self.func, *func_options.values())
         dropdown2.grid(column=1,row=2)
 
 
         ''' Domain Tab'''
         tk.Label(self.tab2, text="Space time conditions").grid(column=0,row=0,padx=30,pady=30)
         tk.Label(self.tab2, text="End time:").grid(column=0,row=1)
-        end_time = tk.Entry(self.tab2, width=10)
-        end_time.grid(column=1,row=1)
+        self.end_time = tk.Entry(self.tab2, width=10)
+        self.end_time.insert(0, '1')
+        self.end_time.grid(column=1,row=1)
         tk.Label(self.tab2, text="Coordinates:").grid(column=0,row=2,padx=30,pady=30)
 
         self.dim = tk.IntVar() # dim for dimensions or the chosen coordinates
@@ -67,23 +70,13 @@ class Interaction:
         ''' Conditions Tab '''
         # self.frame = tk.Frame(self.master) # sorry, i ruined your button :) (having troubles with setting up the button decor: font etc.)
         # self.frame.pack(side=tk.TOP, pady=40)
-        button = tk.Button(self.tab3, text='Сформулювати умову задачі з файлу "'+self.file_1+'"',
+        button = tk.Button(self.tab3,
+                           text='Сформулювати умову задачі з "'+self.file_1+'",т-ки для поч. умов:"'+self.init+'", крайов. умов.: "'+ self.boun+'"',
                            command=self.run)#, **{'font': font_, 'bg': 'orange', 'bd': 6, 'padx': 10, 'pady': 10})
         button.grid(column=0,row=0,padx=30,pady=30)
         # button.pack(**{'side': tk.TOP, 'padx': 10})
 
-        ''' Modelling Tab '''
-        tk.Label(self.tab4, text='Number of coordinates (x,0) for modelling func u0').grid(column=0,row=0,padx=30,pady=30)
-        self.u0_amount = tk.Spinbox(self.tab4, from_=0, to=20, width=5)
-        self.u0_amount.grid(column=1,row=0)
-        btn = tk.Button(self.tab4, text="OK", command=self.set_u0)
-        btn.grid(column=2, row=0, padx=30)
 
-        tk.Label(self.tab4, text='Number of coordinates (x, t) for modelling func M_Gamma').grid(column=0, row=10, padx=30, pady=30)
-        self.M_Gamma_amount = tk.Spinbox(self.tab4, from_=0, to=20, width=5)
-        self.M_Gamma_amount.grid(column=1, row=10)
-        btn = tk.Button(self.tab4, text="OK", command=self.set_M_Gamma)
-        btn.grid(column=2, row=10, padx=30)
 
     def set_a_b(self): # TODO: this method for input a, b
         tk.Label(self.tab2, text="You have chosen " + str(self.dim.get())).grid(column=0, row=4, padx=30, pady=30)
@@ -95,10 +88,10 @@ class Interaction:
         tk.Label(self.tab4, text="You have chosen " + str(self.M_Gamma_amount.get()) + " number of coords").grid(column=0, row=11, padx=30, pady=30)
 
     def run(self):
-        data = LoadTheData(self.file_1,self.init,self.boun)
-        system = SystemBuilder(data)
-        solution = SolveTheIntegral(system)
-        ShowTheSolution(solution)
+        data = LoadTheData(self.file_1, self.init, self.boun)
+        system = SystemBuilder(data, float(self.end_time.get()), self.ModelType.get(), self.func.get())
+        solution = SolveTheIntegral(system).solve()
+        ShowTheSolution(solution, data)
 
 
 root = tk.Tk()
